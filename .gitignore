@@ -1,0 +1,28 @@
+# Node modules
+node_modules/
+
+# Environment variables
+.env
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS-specifikus fájlok
+.DS_Store
+Thumbs.db
+
+# IDE-k és szerkesztők által generált fájlok
+.vscode/
+.idea/
+*.swp
+
+# Coverage reports (ha használsz tesztelést)
+coverage/
+
+# Build kimenet (ha van, pl. dist/)
+dist/
+build/
