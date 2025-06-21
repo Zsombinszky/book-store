@@ -1,18 +1,40 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useSnackbar } from "notistack";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import BackButton from "../components/BackButton";
 import Spinner from "../components/Spinner";
+import { useSnackbar } from "notistack";
 
-const CreateBookPage = () => {
+const EditBook = () => {
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
   const [publishYear, setPublishYear] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { id } = useParams();
   const { enqueueSnackbar } = useSnackbar();
 
-  const handleSaveBook = async (e) => {
+  useEffect(() => {
+    const fetchBook = async () => {
+      try {
+        setLoading(true);
+        const res = await fetch(`http://localhost:5555/api/books/${id}`);
+        const data = await res.json();
+        setAuthor(data.author);
+        setTitle(data.title);
+        setPublishYear(data.publishYear);
+      } catch (error) {
+        setLoading(false);
+        alert("An error happened. Please Check console");
+        console.log(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBook();
+  }, [id]);
+
+  const handleEditBook = async (e) => {
     e.preventDefault();
     const data = {
       title,
@@ -23,8 +45,8 @@ const CreateBookPage = () => {
     setLoading(true);
 
     try {
-      const res = await fetch("http://localhost:5555/api/books", {
-        method: "POST",
+      const res = await fetch(`http://localhost:5555/api/books/${id}`, {
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
@@ -32,11 +54,12 @@ const CreateBookPage = () => {
       });
 
       if (!res.ok) {
-        throw new Error("Failed to create book");
+        throw new Error("Failed to update book");
       }
-      enqueueSnackbar("Book created successfully", { variant: "success" });
+      enqueueSnackbar("Book edited successfully", { variant: "success" });
       navigate("/");
     } catch (error) {
+      setLoading(false);
       console.error(error);
       enqueueSnackbar("Error", { variant: "error" });
     } finally {
@@ -47,10 +70,10 @@ const CreateBookPage = () => {
   return (
     <div className="p-4">
       <BackButton />
-      <h1 className="text-3xl my-4">Create Book</h1>
+      <h1 className="text-3xl my-4">Edit Book</h1>
       {loading && <Spinner />}
       <form
-        onSubmit={handleSaveBook}
+        onSubmit={handleEditBook}
         className="flex flex-col border-2 border-sky-400 rounded-xl w-[600px] p-4 mx-auto"
       >
         <div className="my-4">
@@ -97,4 +120,4 @@ const CreateBookPage = () => {
   );
 };
 
-export default CreateBookPage;
+export default EditBook;
